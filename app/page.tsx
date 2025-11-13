@@ -1,130 +1,213 @@
-import { Metadata } from "next";
-import Link from "next/link";
+'use client';
 
-export const metadata: Metadata = {
-  title: "Dashboard | IPMS",
-  description: "Integrated Patient Management System - Patient Photo Management Dashboard",
-};
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Upload, HardDrive, Users, FileImage, ArrowRight, AlertCircle } from 'lucide-react';
+import { PatientList } from '@/components/patient/patient-list';
+import { useStorageInfo } from '@/lib/hooks/use-storage-info';
+import { initializeStorage } from '@/lib/storage/file-storage';
 
 export default function HomePage() {
+  const { storageInfo, metadata, isLoading } = useStorageInfo();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Initialize storage on mount
+  useEffect(() => {
+    initializeStorage();
+  }, []);
+
+  // Format bytes to readable size
+  const formatSize = (bytes: number): string => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+  };
+
+  // Get storage warning level
+  const getStorageWarning = () => {
+    if (!storageInfo) return null;
+    if (storageInfo.usagePercentage >= 95) {
+      return { level: 'critical', message: 'Storage is almost full' };
+    }
+    if (storageInfo.usagePercentage >= 80) {
+      return { level: 'warning', message: 'Storage is getting full' };
+    }
+    return null;
+  };
+
+  const storageWarning = getStorageWarning();
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-          Welcome to IPMS
+          Dashboard
         </h1>
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-          Integrated Patient Management System - Manage patient photos securely and efficiently
+          Patient Photo Management System - View and manage patient photos
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Link
-          href="/upload"
-          className="group rounded-lg border border-zinc-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+      {/* Storage Warning */}
+      {storageWarning && (
+        <div
+          className={`mb-6 rounded-lg border p-4 ${
+            storageWarning.level === 'critical'
+              ? 'border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/50'
+              : 'border-yellow-300 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/50'
+          }`}
         >
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
-            <svg
-              className="h-6 w-6 text-blue-600 dark:text-blue-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="flex items-center gap-3">
+            <AlertCircle
+              className={`h-5 w-5 ${
+                storageWarning.level === 'critical'
+                  ? 'text-red-600 dark:text-red-400'
+                  : 'text-yellow-600 dark:text-yellow-400'
+              }`}
+            />
+            <div>
+              <p
+                className={`font-medium ${
+                  storageWarning.level === 'critical'
+                    ? 'text-red-900 dark:text-red-100'
+                    : 'text-yellow-900 dark:text-yellow-100'
+                }`}
+              >
+                {storageWarning.message}
+              </p>
+              <p
+                className={`text-sm ${
+                  storageWarning.level === 'critical'
+                    ? 'text-red-700 dark:text-red-300'
+                    : 'text-yellow-700 dark:text-yellow-300'
+                }`}
+              >
+                {storageInfo && `${storageInfo.usagePercentage.toFixed(1)}% used`} - Consider
+                deleting old files or clearing storage.
+              </p>
+            </div>
+            <Link
+              href="/storage"
+              className="ml-auto flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
+              Manage Storage
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          <h2 className="mb-2 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-            Upload Photos
-          </h2>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Upload patient photos with metadata and automatic processing
-          </p>
-        </Link>
+        </div>
+      )}
 
-        <Link
-          href="/storage"
-          className="group rounded-lg border border-zinc-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
-        >
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/20">
-            <svg
-              className="h-6 w-6 text-green-600 dark:text-green-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
-              />
-            </svg>
+      {/* Stats Cards */}
+      <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">Total Patients</p>
+              <p className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+                {isLoading ? '-' : metadata?.totalPatients || 0}
+              </p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
+              <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
           </div>
-          <h2 className="mb-2 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-            Storage Management
-          </h2>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Monitor storage usage and manage photo lifecycle policies
-          </p>
-        </Link>
+        </div>
 
         <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/20">
-            <svg
-              className="h-6 w-6 text-purple-600 dark:text-purple-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">Total Files</p>
+              <p className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+                {isLoading ? '-' : metadata?.totalFiles || 0}
+              </p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/20">
+              <FileImage className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
           </div>
-          <h2 className="mb-2 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-            Analytics
-          </h2>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            View storage statistics and usage patterns
-          </p>
-          <span className="mt-4 inline-block text-xs text-zinc-500 dark:text-zinc-500">
-            Coming soon
-          </span>
         </div>
+
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">Storage Used</p>
+              <p className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+                {isLoading ? '-' : formatSize(metadata?.totalSize || 0)}
+              </p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/20">
+              <HardDrive className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+          </div>
+          {storageInfo && (
+            <div className="mt-3">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                <div
+                  className={`h-full transition-all ${
+                    storageInfo.usagePercentage >= 95
+                      ? 'bg-red-600'
+                      : storageInfo.usagePercentage >= 80
+                      ? 'bg-yellow-600'
+                      : 'bg-purple-600'
+                  }`}
+                  style={{ width: `${Math.min(storageInfo.usagePercentage, 100)}%` }}
+                />
+              </div>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-500">
+                {storageInfo.usagePercentage.toFixed(1)}% of {formatSize(storageInfo.limit)} used
+              </p>
+            </div>
+          )}
+        </div>
+
+        <Link
+          href="/upload"
+          className="group rounded-lg border border-zinc-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:from-blue-950/50 dark:to-blue-900/50"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                Quick Action
+              </p>
+              <p className="mt-2 text-xl font-bold text-blue-900 dark:text-blue-50">
+                Upload Files
+              </p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600 text-white transition-transform group-hover:scale-110">
+              <Upload className="h-6 w-6" />
+            </div>
+          </div>
+        </Link>
       </div>
 
-      <div className="mt-12 rounded-lg border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900/50">
-        <h3 className="mb-3 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-          Quick Stats
-        </h3>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Total Photos</p>
-            <p className="mt-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-              0
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Storage Used</p>
-            <p className="mt-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-              0 GB
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Patients</p>
-            <p className="mt-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-              0
-            </p>
+      {/* Patient List Section */}
+      <div className="mb-8">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+            Patients
+          </h2>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              placeholder="Search patients..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-900 placeholder-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+            />
+            <Link
+              href="/storage"
+              className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
+            >
+              <HardDrive className="h-4 w-4" />
+              Storage
+            </Link>
           </div>
         </div>
+
+        <PatientList searchQuery={searchQuery} />
       </div>
     </div>
   );
