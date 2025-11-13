@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { FileQuestion, Home, Search, Upload, HardDrive, ArrowLeft } from 'lucide-react';
 

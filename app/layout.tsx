@@ -20,17 +20,6 @@ export const metadata: Metadata = {
     "HIPAA compliant",
   ],
   authors: [{ name: "IPMS Team" }],
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-    viewportFit: "cover",
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
-  ],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -38,6 +27,18 @@ export const metadata: Metadata = {
     title: "IPMS",
   },
 };
+
+export const generateViewport = () => ({
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover" as const,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
+});
 
 export default function RootLayout({
   children,
@@ -47,11 +48,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className="flex min-h-screen flex-col font-sans antialiased"
+        className="flex min-h-screen flex-col font-sans antialiased overflow-x-hidden"
       >
-        <Header />
-        <Navigation />
-        <main className="flex-1 bg-zinc-50 dark:bg-black">{children}</main>
+        <div className="flex w-full flex-col">
+          <Header />
+          <Navigation />
+        </div>
+        <main className="flex-1 w-full bg-gray-50 dark:bg-zinc-950">
+          {children}
+        </main>
         <Footer />
         <Toaster position="top-right" richColors />
       </body>

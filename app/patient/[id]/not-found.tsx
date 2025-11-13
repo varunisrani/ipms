@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { UserX, Home, Search, Upload, ArrowLeft, Users } from 'lucide-react';
 

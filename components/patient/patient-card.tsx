@@ -29,58 +29,58 @@ export function PatientCard({ patient }: PatientCardProps) {
   return (
     <Link
       href={`/patient/${patient.id}`}
-      className="group block rounded-lg border border-zinc-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-blue-700"
+      className="group block bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow"
     >
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
             <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <div>
-            <h3 className="font-mono text-lg font-semibold text-zinc-900 dark:text-zinc-50 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+          <div className="min-w-0">
+            <h3 className="font-mono text-sm font-bold text-zinc-900 dark:text-white truncate">
               {patient.id}
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-500">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Patient ID
             </p>
           </div>
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4 flex-shrink-0" />
             <span>Files</span>
           </div>
-          <span className="font-semibold text-zinc-900 dark:text-zinc-50">
+          <span className="font-semibold text-zinc-900 dark:text-white">
             {patient.totalFiles}
           </span>
         </div>
 
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4 flex-shrink-0" />
             <span>Dates</span>
           </div>
-          <span className="font-semibold text-zinc-900 dark:text-zinc-50">
+          <span className="font-semibold text-zinc-900 dark:text-white">
             {dateCount}
           </span>
         </div>
 
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-            <HardDrive className="h-4 w-4" />
+            <HardDrive className="h-4 w-4 flex-shrink-0" />
             <span>Storage</span>
           </div>
-          <span className="font-semibold text-zinc-900 dark:text-zinc-50">
+          <span className="font-semibold text-zinc-900 dark:text-white">
             {formatSize(patient.totalSize)}
           </span>
         </div>
 
-        <div className="flex items-center justify-between text-sm pt-3 border-t border-zinc-100 dark:border-zinc-800">
+        <div className="flex items-center justify-between text-xs pt-2 border-t border-gray-200 dark:border-zinc-800 mt-2">
           <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-500">
-            <Clock className="h-4 w-4" />
+            <Clock className="h-3.5 w-3.5 flex-shrink-0" />
             <span>Updated</span>
           </div>
           <span className="text-zinc-600 dark:text-zinc-400">

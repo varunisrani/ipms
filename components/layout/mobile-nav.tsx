@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createPortal } from "react-dom";
 
 export interface NavItem {
   name: string;
@@ -23,11 +22,6 @@ export interface MobileNavProps {
  */
 export default function MobileNav({ items, isOpen, onClose }: MobileNavProps) {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -46,17 +40,19 @@ export default function MobileNav({ items, isOpen, onClose }: MobileNavProps) {
         document.body.style.overflow = "unset";
         document.removeEventListener("keydown", handleEscape);
       };
+    } else {
+      document.body.style.overflow = "unset";
     }
   }, [isOpen, onClose]);
 
   // Close menu when route changes
   useEffect(() => {
-    onClose();
-  }, [pathname, onClose]);
+    if (isOpen) {
+      onClose();
+    }
+  }, [pathname]);
 
-  if (!mounted) return null;
-
-  const menuContent = (
+  return (
     <>
       {/* Backdrop */}
       <div
@@ -156,8 +152,6 @@ export default function MobileNav({ items, isOpen, onClose }: MobileNavProps) {
       </nav>
     </>
   );
-
-  return createPortal(menuContent, document.body);
 }
 
 /**

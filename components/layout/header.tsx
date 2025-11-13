@@ -1,9 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import MobileNav, { HamburgerButton } from "./mobile-nav";
-import { useResponsive } from "@/hooks/use-responsive";
+import { useState } from 'react';
+import Link from 'next/link';
+import MobileNav, { HamburgerButton } from './mobile-nav';
 
 // Navigation items shared between mobile and desktop
 const navItems = [
@@ -28,7 +27,7 @@ const navItems = [
   },
   {
     name: "Upload",
-    href: "/upload",
+    href: "/upload-new",
     icon: (
       <svg
         className="h-5 w-5"
@@ -46,8 +45,8 @@ const navItems = [
     ),
   },
   {
-    name: "Storage Management",
-    href: "/storage",
+    name: "Storage",
+    href: "/storage-new",
     icon: (
       <svg
         className="h-5 w-5"
@@ -68,29 +67,26 @@ const navItems = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isMobile, isTablet } = useResponsive();
-
-  const showMobileNav = isMobile || isTablet;
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95">
+      <header className="sticky top-0 z-30 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            {/* Mobile Menu Button - Only show on mobile/tablet */}
-            {showMobileNav && (
+            {/* Mobile Menu Button - Always render, control visibility with CSS */}
+            <div className="lg:hidden">
               <HamburgerButton
                 isOpen={mobileMenuOpen}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               />
-            )}
+            </div>
 
             {/* Logo */}
             <Link
               href="/"
-              className={`flex items-center gap-3 ${showMobileNav ? "mx-auto" : ""}`}
+              className="flex items-center gap-3 lg:mr-auto mx-auto lg:mx-0"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 shadow-lg shadow-blue-600/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
                 <svg
                   className="h-6 w-6 text-white"
                   fill="none"
@@ -106,29 +102,27 @@ export default function Header() {
                 </svg>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                <h1 className="text-base font-bold text-zinc-900 dark:text-white">
                   IPMS
                 </h1>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Patient Photo Management
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                  Patient Management System
                 </p>
               </div>
             </Link>
 
             {/* Spacer for mobile layout balance */}
-            {showMobileNav && <div className="w-11" />}
+            <div className="w-11 lg:hidden" />
           </div>
         </div>
       </header>
 
-      {/* Mobile Navigation Drawer */}
-      {showMobileNav && (
-        <MobileNav
-          items={navItems}
-          isOpen={mobileMenuOpen}
-          onClose={() => setMobileMenuOpen(false)}
-        />
-      )}
+      {/* Mobile Navigation Drawer - Always render */}
+      <MobileNav
+        items={navItems}
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
     </>
   );
 }

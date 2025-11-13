@@ -2,23 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Upload, HardDrive, Users, FileImage, ArrowRight, AlertCircle, Download } from 'lucide-react';
-import { PatientList } from '@/components/patient/patient-list';
-import { useStorageInfo } from '@/lib/hooks/use-storage-info';
-import { initializeStorage } from '@/lib/storage/file-storage';
-import { ExportDataButton } from '@/components/export/export-data-button';
+import styles from './page.module.css';
 
-export default function HomePage() {
-  const { storageInfo, metadata, isLoading } = useStorageInfo();
-  const [searchQuery, setSearchQuery] = useState('');
+export default function NewDashboard() {
+  const [storageUsed, setStorageUsed] = useState(0);
+  const [totalPatients, setTotalPatients] = useState(0);
+  const [totalFiles, setTotalFiles] = useState(0);
+  const [totalSize, setTotalSize] = useState('0 B');
 
-  // Initialize storage on mount
-  useEffect(() => {
-    initializeStorage();
-  }, []);
-
-  // Format bytes to readable size
-  const formatSize = (bytes: number): string => {
+  const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
@@ -26,217 +18,210 @@ export default function HomePage() {
     return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
   };
 
-  // Get storage warning level
-  const getStorageWarning = () => {
-    if (!storageInfo) return null;
-    if (storageInfo.usagePercentage >= 95) {
-      return { level: 'critical', message: 'Storage is almost full' };
+  useEffect(() => {
+    // Load data from localStorage
+    try {
+      const patientsData = JSON.parse(localStorage.getItem('patients') || '{}');
+      const patientIds = Object.keys(patientsData);
+
+      let filesCount = 0;
+      let totalBytes = 0;
+
+      patientIds.forEach((patientId) => {
+        const patient = patientsData[patientId];
+        filesCount += patient.files.length;
+        patient.files.forEach((file: any) => {
+          totalBytes += file.size;
+        });
+      });
+
+      setTotalPatients(patientIds.length);
+      setTotalFiles(filesCount);
+      setTotalSize(formatFileSize(totalBytes));
+      setStorageUsed((totalBytes / (5 * 1024 * 1024)) * 100); // Percentage of 5MB
+    } catch (error) {
+      console.error('Error loading data:', error);
+      setStorageUsed(0);
+      setTotalPatients(0);
+      setTotalFiles(0);
+      setTotalSize('0 B');
     }
-    if (storageInfo.usagePercentage >= 80) {
-      return { level: 'warning', message: 'Storage is getting full' };
-    }
-    return null;
+  }, []);
+
+  const getProgressClass = () => {
+    if (storageUsed >= 95) return styles.danger;
+    if (storageUsed >= 80) return styles.warning;
+    return '';
   };
 
-  const storageWarning = getStorageWarning();
+  const handleExportAll = () => {
+    try {
+      const patientsData = localStorage.getItem('patients') || '{}';
+      const dataStr = JSON.stringify(JSON.parse(patientsData), null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ipms_backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      alert('Error exporting data. Please try again.');
+      console.error(error);
+    }
+  };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className={styles.container}>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-          Dashboard
-        </h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-          Patient Photo Management System - View and manage patient photos
+      <div className={styles.header}>
+        <h1 className={styles.title}>Dashboard</h1>
+        <p className={styles.subtitle}>
+          Comprehensive Patient Photo Management System — View, organize, and manage patient photos with ease
         </p>
       </div>
 
-      {/* Storage Warning */}
-      {storageWarning && (
-        <div
-          className={`mb-6 rounded-lg border p-4 ${
-            storageWarning.level === 'critical'
-              ? 'border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/50'
-              : 'border-yellow-300 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/50'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <AlertCircle
-              className={`h-5 w-5 ${
-                storageWarning.level === 'critical'
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-yellow-600 dark:text-yellow-400'
-              }`}
-            />
-            <div>
-              <p
-                className={`font-medium ${
-                  storageWarning.level === 'critical'
-                    ? 'text-red-900 dark:text-red-100'
-                    : 'text-yellow-900 dark:text-yellow-100'
-                }`}
-              >
-                {storageWarning.message}
-              </p>
-              <p
-                className={`text-sm ${
-                  storageWarning.level === 'critical'
-                    ? 'text-red-700 dark:text-red-300'
-                    : 'text-yellow-700 dark:text-yellow-300'
-                }`}
-              >
-                {storageInfo && `${storageInfo.usagePercentage.toFixed(1)}% used`} - Consider
-                deleting old files or clearing storage.
-              </p>
-            </div>
-            <Link
-              href="/storage"
-              className="ml-auto flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
-            >
-              Manage Storage
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      )}
-
       {/* Stats Cards */}
-      <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">Total Patients</p>
-              <p className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-                {isLoading ? '-' : metadata?.totalPatients || 0}
+      <div className={styles.statsGrid}>
+        {/* Total Patients */}
+        <div className={styles.statCard}>
+          <div className={styles.statCardHeader}>
+            <div className={styles.statCardContent}>
+              <p className={styles.statLabel}>Total Patients</p>
+              <p className={styles.statValue}>{totalPatients}</p>
+              <p className={styles.statDescription}>
+                {totalPatients} patient{totalPatients !== 1 ? 's' : ''}
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
-              <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className={`${styles.iconCircle} ${styles.blue}`}>
+              <svg className={styles.icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">Total Files</p>
-              <p className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-                {isLoading ? '-' : metadata?.totalFiles || 0}
+        {/* Total Files */}
+        <div className={styles.statCard}>
+          <div className={styles.statCardHeader}>
+            <div className={styles.statCardContent}>
+              <p className={styles.statLabel}>Total Files</p>
+              <p className={styles.statValue}>{totalFiles}</p>
+              <p className={styles.statDescription}>
+                {totalFiles} file{totalFiles !== 1 ? 's' : ''}
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/20">
-              <FileImage className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className={`${styles.iconCircle} ${styles.green}`}>
+              <svg className={styles.icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">Storage Used</p>
-              <p className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-                {isLoading ? '-' : formatSize(metadata?.totalSize || 0)}
-              </p>
+        {/* Storage Used */}
+        <div className={styles.statCard}>
+          <div className={styles.statCardHeader}>
+            <div className={styles.statCardContent}>
+              <p className={styles.statLabel}>Storage Used</p>
+              <p className={styles.statValue}>{totalSize}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/20">
-              <HardDrive className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <div className={`${styles.iconCircle} ${styles.purple}`}>
+              <svg className={styles.icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+              </svg>
             </div>
           </div>
-          {storageInfo && (
-            <div className="mt-3">
-              <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-                <div
-                  className={`h-full transition-all ${
-                    storageInfo.usagePercentage >= 95
-                      ? 'bg-red-600'
-                      : storageInfo.usagePercentage >= 80
-                      ? 'bg-yellow-600'
-                      : 'bg-purple-600'
-                  }`}
-                  style={{ width: `${Math.min(storageInfo.usagePercentage, 100)}%` }}
-                />
-              </div>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-500">
-                {storageInfo.usagePercentage.toFixed(1)}% of {formatSize(storageInfo.limit)} used
-              </p>
+          <div className={styles.progressBar}>
+            <div className={styles.progressBarTrack}>
+              <div
+                className={`${styles.progressBarFill} ${getProgressClass()}`}
+                style={{ width: `${Math.min(storageUsed, 100)}%` }}
+              />
             </div>
-          )}
+            <p className={styles.progressLabel}>
+              {storageUsed.toFixed(1)}% of 5.00 MB used
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="mb-8 grid gap-6 sm:grid-cols-2">
-        <Link
-          href="/upload"
-          className="group rounded-lg border border-zinc-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:from-blue-950/50 dark:to-blue-900/50"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                Quick Action
-              </p>
-              <p className="mt-2 text-xl font-bold text-blue-900 dark:text-blue-50">
-                Upload Files
-              </p>
-              <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                Add new patient photos
-              </p>
+      <div className={styles.actionsGrid}>
+        {/* Upload Files */}
+        <Link href="/upload-new" className={styles.actionCard}>
+          <div className={styles.actionCardHeader}>
+            <div className={styles.actionCardContent}>
+              <p className={`${styles.actionLabel} ${styles.blue}`}>Quick Action</p>
+              <h2 className={styles.actionTitle}>Upload Files</h2>
+              <p className={styles.actionDescription}>Add new patient photos to the system</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600 text-white transition-transform group-hover:scale-110">
-              <Upload className="h-6 w-6" />
+            <div className={`${styles.actionIcon} ${styles.blue}`}>
+              <svg className={styles.icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
             </div>
           </div>
         </Link>
 
-        <div className="rounded-lg border border-zinc-200 bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-sm dark:border-zinc-800 dark:from-green-950/50 dark:to-green-900/50">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-green-900 dark:text-green-100">
-                Data Backup
-              </p>
-              <p className="mt-2 text-xl font-bold text-green-900 dark:text-green-50">
-                Export All Data
-              </p>
-              <p className="mt-1 text-sm text-green-700 dark:text-green-300">
-                Download complete backup as JSON
-              </p>
-              <div className="mt-4">
-                <ExportDataButton variant="outline" className="border-green-200 bg-white text-green-900 hover:bg-green-50 dark:border-green-800 dark:bg-green-950 dark:text-green-50 dark:hover:bg-green-900" />
-              </div>
+        {/* Export Data */}
+        <div className={styles.actionCard}>
+          <div className={styles.actionCardHeader}>
+            <div className={styles.actionCardContent}>
+              <p className={`${styles.actionLabel} ${styles.green}`}>Data Backup</p>
+              <h2 className={styles.actionTitle}>Export All Data</h2>
+              <p className={styles.actionDescription}>Download complete backup as JSON</p>
+              <button onClick={handleExportAll} className={styles.actionButton}>Export All Data</button>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-600 text-white">
-              <Download className="h-6 w-6" />
+            <div className={`${styles.actionIcon} ${styles.green}`}>
+              <svg className={styles.icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Patient List Section */}
-      <div className="mb-8">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            Patients
-          </h2>
-          <div className="flex gap-3">
+      {/* Patients Section */}
+      <div className={styles.patientsSection}>
+        <div className={styles.patientsSectionHeader}>
+          <div className={styles.patientsSectionTitle}>
+            <h2 className={styles.patientsSectionTitleText}>Patients</h2>
+            <p className={styles.patientsSectionSubtitle}>Manage and view all patient records</p>
+          </div>
+          <div className={styles.patientsControls}>
             <input
               type="text"
               placeholder="Search patients..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-900 placeholder-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+              className={styles.searchInput}
             />
-            <Link
-              href="/storage"
-              className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
-            >
-              <HardDrive className="h-4 w-4" />
+            <Link href="/storage-new" className={styles.storageButton}>
+              <svg className={styles.iconSmall} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+              </svg>
               Storage
             </Link>
           </div>
         </div>
 
-        <PatientList searchQuery={searchQuery} />
+        {/* Empty State */}
+        <div className={styles.emptyState}>
+          <div className={styles.emptyStateIcon}>
+            <svg className={styles.icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <h3 className={styles.emptyStateTitle}>No patients yet</h3>
+          <p className={styles.emptyStateDescription}>
+            Start by uploading files for a patient to see them appear here.
+          </p>
+          <Link href="/upload-new" className={styles.uploadButton}>
+            <svg className={styles.iconSmall} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Upload Patient Files
+          </Link>
+        </div>
       </div>
     </div>
   );

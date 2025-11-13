@@ -1,0 +1,468 @@
+/* Clean Dashboard Styles - No Tailwind */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #18181b;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #71717a;
+  margin: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.statCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.statCardContent {
+  flex: 1;
+}
+
+.statLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #71717a;
+  margin: 0 0 8px 0;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: #18181b;
+  margin: 0 0 8px 0;
+  line-height: 1;
+}
+
+.statDescription {
+  font-size: 12px;
+  color: #a1a1aa;
+  margin: 0;
+}
+
+.iconCircle {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconCircle.blue {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.iconCircle.green {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.iconCircle.purple {
+  background-color: #e9d5ff;
+  color: #9333ea;
+}
+
+.progressBar {
+  margin-top: 16px;
+}
+
+.progressBarTrack {
+  width: 100%;
+  height: 8px;
+  background-color: #e4e4e7;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.progressBarFill.warning {
+  background-color: #eab308;
+}
+
+.progressBarFill.danger {
+  background-color: #ef4444;
+}
+
+.progressLabel {
+  font-size: 12px;
+  color: #71717a;
+  margin-top: 8px;
+}
+
+.actionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.actionCard {
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.actionCard:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.actionCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.actionCardContent {
+  flex: 1;
+}
+
+.actionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px 0;
+}
+
+.actionLabel.blue {
+  color: #2563eb;
+}
+
+.actionLabel.green {
+  color: #059669;
+}
+
+.actionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #18181b;
+  margin: 0 0 8px 0;
+}
+
+.actionDescription {
+  font-size: 14px;
+  color: #71717a;
+  margin: 0 0 16px 0;
+}
+
+.actionButton {
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #18181b;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.actionButton:hover {
+  background-color: #f4f4f5;
+}
+
+.actionIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+}
+
+.actionIcon.blue {
+  background-color: #2563eb;
+}
+
+.actionIcon.green {
+  background-color: #059669;
+}
+
+.patientsSection {
+  margin-bottom: 32px;
+}
+
+.patientsSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.patientsSectionTitle {
+  flex: 1;
+}
+
+.patientsSectionTitleText {
+  font-size: 24px;
+  font-weight: 700;
+  color: #18181b;
+  margin: 0 0 4px 0;
+}
+
+.patientsSectionSubtitle {
+  font-size: 14px;
+  color: #71717a;
+  margin: 0;
+}
+
+.patientsControls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  width: 250px;
+  padding: 10px 12px;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #18181b;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: #3b82f6;
+}
+
+.searchInput::placeholder {
+  color: #a1a1aa;
+}
+
+.storageButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #18181b;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.storageButton:hover {
+  background-color: #f4f4f5;
+}
+
+.emptyState {
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.emptyStateIcon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  background-color: #1e40af;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.emptyStateTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #18181b;
+  margin: 0 0 8px 0;
+}
+
+.emptyStateDescription {
+  font-size: 14px;
+  color: #71717a;
+  margin: 0 0 24px 0;
+}
+
+.uploadButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.uploadButton:hover {
+  background-color: #1d4ed8;
+}
+
+/* SVG Icons */
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.iconSmall {
+  width: 20px;
+  height: 20px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .title {
+    color: #fafafa;
+  }
+
+  .subtitle {
+    color: #a1a1aa;
+  }
+
+  .statCard,
+  .actionCard,
+  .emptyState {
+    background: #18181b;
+    border-color: #27272a;
+  }
+
+  .statLabel,
+  .actionDescription,
+  .patientsSectionSubtitle {
+    color: #a1a1aa;
+  }
+
+  .statValue,
+  .actionTitle,
+  .patientsSectionTitleText,
+  .emptyStateTitle {
+    color: #fafafa;
+  }
+
+  .iconCircle.blue {
+    background-color: rgba(37, 99, 235, 0.2);
+    color: #60a5fa;
+  }
+
+  .iconCircle.green {
+    background-color: rgba(5, 150, 105, 0.2);
+    color: #34d399;
+  }
+
+  .iconCircle.purple {
+    background-color: rgba(147, 51, 234, 0.2);
+    color: #c084fc;
+  }
+
+  .progressBarTrack {
+    background-color: #27272a;
+  }
+
+  .searchInput,
+  .storageButton,
+  .actionButton {
+    background: #18181b;
+    border-color: #27272a;
+    color: #fafafa;
+  }
+
+  .searchInput:focus {
+    border-color: #3b82f6;
+  }
+
+  .searchInput::placeholder {
+    color: #52525b;
+  }
+
+  .storageButton:hover,
+  .actionButton:hover {
+    background-color: #27272a;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 24px 16px;
+  }
+
+  .statsGrid,
+  .actionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .patientsSectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .patientsControls {
+    width: 100%;
+  }
+
+  .searchInput {
+    width: 100%;
+  }
+}

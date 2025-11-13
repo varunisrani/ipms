@@ -1,0 +1,1040 @@
+/* Clean Storage Page Styles - No Tailwind */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #18181b;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #71717a;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #18181b;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.refreshButton:hover:not(:disabled) {
+  background-color: #f4f4f5;
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.exportButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #2563eb;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.exportButton:hover {
+  background-color: #1d4ed8;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.iconSpin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.statCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.statCardContent {
+  flex: 1;
+}
+
+.statLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #71717a;
+  margin: 0 0 8px 0;
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: #18181b;
+  margin: 0;
+  line-height: 1;
+}
+
+.iconCircle {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconCircle.blue {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.iconCircle.purple {
+  background-color: #e9d5ff;
+  color: #9333ea;
+}
+
+.iconCircle.green {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.iconCircle.orange {
+  background-color: #fed7aa;
+  color: #ea580c;
+}
+
+.iconLarge {
+  width: 24px;
+  height: 24px;
+}
+
+/* Storage Meter */
+.storageMeterCard {
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  margin-bottom: 24px;
+}
+
+.meterTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #18181b;
+  margin: 0 0 16px 0;
+}
+
+.meterBar {
+  width: 100%;
+  height: 12px;
+  background-color: #e4e4e7;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.meterFill {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.meterFill.warning {
+  background-color: #eab308;
+}
+
+.meterFill.danger {
+  background-color: #ef4444;
+}
+
+.meterInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #71717a;
+}
+
+/* Info Card */
+.infoCard {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.infoCard.warning {
+  background: #fef3c7;
+  border-color: #fde68a;
+}
+
+.infoContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.infoIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.infoIcon.blue {
+  color: #2563eb;
+}
+
+.infoIcon.orange {
+  color: #ea580c;
+}
+
+.infoText {
+  flex: 1;
+}
+
+.infoTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e40af;
+  margin: 0 0 4px 0;
+}
+
+.infoTitle.warning {
+  color: #92400e;
+}
+
+.infoDescription {
+  font-size: 14px;
+  color: #1e40af;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.infoDescription.warning {
+  color: #92400e;
+}
+
+.infoDescription strong {
+  font-weight: 600;
+}
+
+/* Main Content Grid */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .contentGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Card */
+.card {
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #18181b;
+  margin: 0 0 16px 0;
+}
+
+/* Patient List */
+.patientList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.patientItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: #fafafa;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.patientItem:hover {
+  background-color: #f4f4f5;
+}
+
+.patientInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.patientId {
+  font-size: 14px;
+  font-weight: 600;
+  color: #18181b;
+  margin: 0 0 4px 0;
+  font-family: 'Courier New', monospace;
+}
+
+.patientStats {
+  font-size: 12px;
+  color: #71717a;
+  margin: 0;
+}
+
+/* Image Preview */
+.imagePreview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.previewItem {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e4e4e7;
+  background-color: #f4f4f5;
+}
+
+.thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pdfIcon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #71717a;
+}
+
+.pdfIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.moreFiles {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e4e4e7;
+  color: #52525b;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #d4d4d8;
+}
+
+.deleteButton {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteButton:hover {
+  background-color: #fee2e2;
+  border-color: #dc2626;
+}
+
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  color: #71717a;
+}
+
+.emptyStateIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background-color: #e4e4e7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #71717a;
+}
+
+.emptyStateText {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Tools Section */
+.toolsSection {
+  margin-bottom: 24px;
+}
+
+.toolButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #18181b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.toolButton:hover {
+  background-color: #f4f4f5;
+}
+
+.toolButton.danger {
+  color: #dc2626;
+}
+
+.toolButton.danger:hover {
+  background-color: #fee2e2;
+  border-color: #dc2626;
+}
+
+/* Tips List */
+.tipsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tipItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e4e4e7;
+}
+
+.tipItem:last-child {
+  border-bottom: none;
+}
+
+.tipIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tipIcon.green {
+  color: #059669;
+}
+
+.tipIcon.blue {
+  color: #2563eb;
+}
+
+.tipIcon.orange {
+  color: #ea580c;
+}
+
+.tipIcon.purple {
+  color: #9333ea;
+}
+
+.tipText {
+  flex: 1;
+  font-size: 14px;
+  color: #71717a;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .title {
+    color: #fafafa;
+  }
+
+  .subtitle {
+    color: #a1a1aa;
+  }
+
+  .refreshButton,
+  .card,
+  .statCard,
+  .storageMeterCard,
+  .toolButton {
+    background: #18181b;
+    border-color: #27272a;
+  }
+
+  .refreshButton,
+  .toolButton {
+    color: #fafafa;
+  }
+
+  .refreshButton:hover:not(:disabled),
+  .toolButton:hover {
+    background-color: #27272a;
+  }
+
+  .cardTitle,
+  .meterTitle,
+  .statValue,
+  .patientId {
+    color: #fafafa;
+  }
+
+  .statLabel,
+  .meterInfo,
+  .patientStats,
+  .tipText,
+  .emptyStateText {
+    color: #a1a1aa;
+  }
+
+  .iconCircle.blue {
+    background-color: rgba(37, 99, 235, 0.2);
+    color: #60a5fa;
+  }
+
+  .iconCircle.purple {
+    background-color: rgba(147, 51, 234, 0.2);
+    color: #c084fc;
+  }
+
+  .iconCircle.green {
+    background-color: rgba(5, 150, 105, 0.2);
+    color: #34d399;
+  }
+
+  .iconCircle.orange {
+    background-color: rgba(234, 88, 12, 0.2);
+    color: #fb923c;
+  }
+
+  .meterBar {
+    background-color: #27272a;
+  }
+
+  .infoCard {
+    background: rgba(37, 99, 235, 0.1);
+    border-color: rgba(37, 99, 235, 0.2);
+  }
+
+  .infoCard.warning {
+    background: rgba(234, 88, 12, 0.1);
+    border-color: rgba(234, 88, 12, 0.2);
+  }
+
+  .infoTitle {
+    color: #60a5fa;
+  }
+
+  .infoTitle.warning {
+    color: #fb923c;
+  }
+
+  .infoDescription {
+    color: #93c5fd;
+  }
+
+  .infoDescription.warning {
+    color: #fdba74;
+  }
+
+  .patientItem {
+    background-color: #18181b;
+    border-color: #27272a;
+  }
+
+  .patientItem:hover {
+    background-color: #27272a;
+  }
+
+  .deleteButton {
+    border-color: #27272a;
+    color: #f87171;
+  }
+
+  .deleteButton:hover {
+    background-color: rgba(220, 38, 38, 0.2);
+    border-color: #dc2626;
+  }
+
+  .emptyStateIcon {
+    background-color: #27272a;
+    color: #a1a1aa;
+  }
+
+  .toolButton.danger {
+    color: #f87171;
+  }
+
+  .toolButton.danger:hover {
+    background-color: rgba(220, 38, 38, 0.2);
+    border-color: #dc2626;
+  }
+
+  .previewItem {
+    border-color: #27272a;
+    background-color: #27272a;
+  }
+
+  .pdfIcon {
+    color: #a1a1aa;
+  }
+
+  .moreFiles {
+    background-color: #27272a;
+    color: #d4d4d8;
+    border-color: #3f3f46;
+  }
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  background: white;
+  border-radius: 16px;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalHeader {
+  padding: 24px;
+  border-bottom: 1px solid #e4e4e7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #18181b;
+  margin: 0 0 4px 0;
+}
+
+.modalSubtitle {
+  font-size: 14px;
+  color: #71717a;
+  margin: 0;
+}
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.downloadAllButton {
+  padding: 10px 16px;
+  background: #2563eb;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.downloadAllButton:hover {
+  background-color: #1d4ed8;
+}
+
+.closeButton {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.closeButton:hover {
+  background-color: #f4f4f5;
+}
+
+.modalBody {
+  padding: 24px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.fileCard {
+  background: #fafafa;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fileCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.filePreview {
+  width: 100%;
+  height: 200px;
+  background-color: #e4e4e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.filePdfPreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #71717a;
+}
+
+.filePdfPreview svg {
+  width: 48px;
+  height: 48px;
+}
+
+.filePdfPreview p {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.fileDetails {
+  padding: 16px;
+}
+
+.fileName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #18181b;
+  margin: 0 0 4px 0;
+  word-break: break-word;
+}
+
+.fileSize {
+  font-size: 12px;
+  color: #71717a;
+  margin: 0 0 4px 0;
+}
+
+.fileDate {
+  font-size: 12px;
+  color: #71717a;
+  margin: 0 0 12px 0;
+}
+
+.downloadButton {
+  width: 100%;
+  padding: 8px 12px;
+  background: #2563eb;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.downloadButton:hover {
+  background-color: #1d4ed8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 24px 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .headerActions {
+    width: 100%;
+  }
+
+  .refreshButton,
+  .exportButton {
+    flex: 1;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .patientInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .imagePreview {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .previewItem,
+  .moreFiles {
+    width: 44px;
+    height: 44px;
+  }
+
+  .modalOverlay {
+    padding: 16px;
+  }
+
+  .modalContent {
+    max-height: 95vh;
+  }
+
+  .modalHeader {
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modalTitle {
+    font-size: 18px;
+  }
+
+  .modalActions {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .downloadAllButton {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .modalBody {
+    padding: 16px;
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark mode for modal */
+@media (prefers-color-scheme: dark) {
+  .modalContent {
+    background: #18181b;
+    border: 1px solid #27272a;
+  }
+
+  .modalHeader {
+    border-color: #27272a;
+  }
+
+  .modalTitle {
+    color: #fafafa;
+  }
+
+  .modalSubtitle {
+    color: #a1a1aa;
+  }
+
+  .closeButton {
+    border-color: #27272a;
+    color: #fafafa;
+  }
+
+  .closeButton:hover {
+    background-color: #27272a;
+  }
+
+  .downloadAllButton {
+    background-color: #2563eb;
+  }
+
+  .downloadAllButton:hover {
+    background-color: #1d4ed8;
+  }
+
+  .fileCard {
+    background: #27272a;
+    border-color: #3f3f46;
+  }
+
+  .filePreview {
+    background-color: #3f3f46;
+  }
+
+  .filePdfPreview {
+    color: #a1a1aa;
+  }
+
+  .fileName {
+    color: #fafafa;
+  }
+
+  .fileSize,
+  .fileDate {
+    color: #a1a1aa;
+  }
+}
