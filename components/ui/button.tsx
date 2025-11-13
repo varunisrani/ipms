@@ -37,9 +37,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizeStyles = {
-      sm: "px-3 py-1.5 text-sm",
-      md: "px-4 py-2 text-base",
-      lg: "px-6 py-3 text-lg",
+      sm: "px-3 py-2 text-sm min-h-11", // Touch-friendly: 44px minimum
+      md: "px-4 py-2.5 text-base min-h-12", // Touch-friendly: 48px
+      lg: "px-6 py-3 text-lg min-h-14", // Touch-friendly: 56px
     };
 
     return (
