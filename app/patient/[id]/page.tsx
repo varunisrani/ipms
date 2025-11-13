@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Upload, Download, Trash2, Calendar as CalendarIcon } from 'lucide-react';
+import { ArrowLeft, Upload, Calendar as CalendarIcon, ListChecks } from 'lucide-react';
 import { DateSelector } from '@/components/patient/date-selector';
 import { MediaGrid } from '@/components/media/media-grid';
 import { DownloadButton } from '@/components/media/download-button';
@@ -22,6 +22,8 @@ export default function PatientDetailPage({ params }: Props) {
   const [patient, setPatient] = useState<Patient | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [multiSelectMode, setMultiSelectMode] = useState(false);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
 
   // Load patient data
   useEffect(() => {
@@ -98,6 +100,31 @@ export default function PatientDetailPage({ params }: Props) {
       console.error('Delete error:', error);
       toast.error('Failed to delete file');
     }
+  };
+
+  // Toggle multi-select mode
+  const toggleMultiSelectMode = () => {
+    setMultiSelectMode(!multiSelectMode);
+    setSelectedDates([]);
+  };
+
+  // Toggle date selection in multi-select mode
+  const handleToggleDate = (date: string) => {
+    setSelectedDates((prev) =>
+      prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date]
+    );
+  };
+
+  // Get files for selected dates in batch mode
+  const getSelectedDatesFiles = () => {
+    if (!patient) return [];
+    const files: FileMetadata[] = [];
+    selectedDates.forEach((date) => {
+      if (patient.dates[date]) {
+        files.push(...patient.dates[date].files);
+      }
+    });
+    return files;
   };
 
   // Get files for selected date
@@ -225,10 +252,41 @@ export default function PatientDetailPage({ params }: Props) {
       <div className="grid gap-6 lg:grid-cols-4">
         {/* Date Selector */}
         <div className="lg:col-span-1">
+          <div className="mb-4">
+            <button
+              onClick={toggleMultiSelectMode}
+              className={`w-full flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                multiSelectMode
+                  ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-600 dark:bg-blue-950/50 dark:text-blue-300'
+                  : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900'
+              }`}
+            >
+              <ListChecks className="h-4 w-4" />
+              {multiSelectMode ? 'Exit Batch Mode' : 'Batch Download'}
+            </button>
+          </div>
+
+          {multiSelectMode && selectedDates.length > 0 && (
+            <div className="mb-4">
+              <DownloadButton
+                files={getSelectedDatesFiles()}
+                fileName={`patient_${patient.id}_batch_${selectedDates.length}_dates`}
+                variant="multiple"
+                className="w-full justify-center"
+              />
+              <p className="mt-2 text-center text-xs text-zinc-500 dark:text-zinc-500">
+                {selectedDates.length} date{selectedDates.length !== 1 ? 's' : ''} selected
+              </p>
+            </div>
+          )}
+
           <DateSelector
             dates={patient.dates}
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
+            multiSelect={multiSelectMode}
+            selectedDates={selectedDates}
+            onToggleDate={handleToggleDate}
           />
         </div>
 
@@ -238,12 +296,16 @@ export default function PatientDetailPage({ params }: Props) {
             <div className="flex items-center gap-2">
               <CalendarIcon className="h-5 w-5 text-zinc-500" />
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                {selectedDate
+                {multiSelectMode
+                  ? selectedDates.length > 0
+                    ? `${selectedDates.length} date${selectedDates.length !== 1 ? 's' : ''} selected`
+                    : 'Select dates for batch download'
+                  : selectedDate
                   ? formatDate(selectedDate, 'MMMM dd, yyyy')
                   : 'Select a date to view files'}
               </h2>
             </div>
-            {selectedFiles.length > 0 && (
+            {!multiSelectMode && selectedFiles.length > 0 && (
               <DownloadButton
                 files={selectedFiles}
                 fileName={`patient_${patient.id}_${selectedDate}`}
@@ -251,11 +313,23 @@ export default function PatientDetailPage({ params }: Props) {
               />
             )}
           </div>
-          <MediaGrid
-            files={selectedFiles}
-            onDownload={handleDownload}
-            onDelete={handleDelete}
-          />
+          {multiSelectMode ? (
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-12 text-center dark:border-zinc-800 dark:bg-zinc-900/50">
+              <ListChecks className="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-600 mb-4" />
+              <p className="text-lg font-medium text-zinc-900 dark:text-zinc-50 mb-2">
+                Batch Download Mode
+              </p>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Select multiple dates from the left sidebar to download all files from those dates at once.
+              </p>
+            </div>
+          ) : (
+            <MediaGrid
+              files={selectedFiles}
+              onDownload={handleDownload}
+              onDelete={handleDelete}
+            />
+          )}
         </div>
       </div>
     </div>
