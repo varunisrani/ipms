@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, FileImage } from 'lucide-react';
+import { Calendar, FileImage, CheckSquare, Square } from 'lucide-react';
 import type { DateGroup } from '@/lib/types';
 import { formatDate, formatRelativeDate } from '@/lib/utils/date-utils';
 
@@ -8,14 +8,24 @@ interface DateSelectorProps {
   dates: Record<string, DateGroup>;
   selectedDate: string | null;
   onSelectDate: (date: string) => void;
+  multiSelect?: boolean;
+  selectedDates?: string[];
+  onToggleDate?: (date: string) => void;
 }
 
 /**
  * Date selector component
  * Displays dates with file counts for a patient
- * Allows selecting a date to filter files
+ * Supports single selection or multiple selection for batch downloads
  */
-export function DateSelector({ dates, selectedDate, onSelectDate }: DateSelectorProps) {
+export function DateSelector({
+  dates,
+  selectedDate,
+  onSelectDate,
+  multiSelect = false,
+  selectedDates = [],
+  onToggleDate
+}: DateSelectorProps) {
   // Sort dates in descending order (most recent first)
   const sortedDates = Object.keys(dates).sort((a, b) => {
     return new Date(b).getTime() - new Date(a).getTime();
@@ -32,21 +42,31 @@ export function DateSelector({ dates, selectedDate, onSelectDate }: DateSelector
     );
   }
 
+  const handleClick = (dateKey: string) => {
+    if (multiSelect && onToggleDate) {
+      onToggleDate(dateKey);
+    } else {
+      onSelectDate(dateKey);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
-        Select Date ({sortedDates.length})
+        {multiSelect ? `Select Dates (${sortedDates.length})` : `Select Date (${sortedDates.length})`}
       </h3>
       <div className="space-y-2">
         {sortedDates.map((dateKey) => {
           const dateGroup = dates[dateKey];
           const fileCount = dateGroup.files.length;
-          const isSelected = selectedDate === dateKey;
+          const isSelected = multiSelect
+            ? selectedDates.includes(dateKey)
+            : selectedDate === dateKey;
 
           return (
             <button
               key={dateKey}
-              onClick={() => onSelectDate(dateKey)}
+              onClick={() => handleClick(dateKey)}
               className={`w-full rounded-lg border p-4 text-left transition-all ${
                 isSelected
                   ? 'border-blue-500 bg-blue-50 dark:border-blue-600 dark:bg-blue-950/50'
@@ -55,6 +75,15 @@ export function DateSelector({ dates, selectedDate, onSelectDate }: DateSelector
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
+                  {multiSelect ? (
+                    <div className={`flex h-6 w-6 items-center justify-center`}>
+                      {isSelected ? (
+                        <CheckSquare className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                      ) : (
+                        <Square className="h-6 w-6 text-zinc-400 dark:text-zinc-600" />
+                      )}
+                    </div>
+                  ) : null}
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                       isSelected

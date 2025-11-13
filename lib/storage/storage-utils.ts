@@ -123,3 +123,93 @@ export function getStorageUsagePercentage(): number {
   const { total } = getLocalStorageUsage();
   return Math.round((total / limit) * 100);
 }
+
+/**
+ * Get localStorage usage for a specific key
+ * @param key - localStorage key to check
+ * @returns Size in bytes
+ */
+export function getKeyUsage(key: string): number {
+  try {
+    const value = localStorage.getItem(key);
+    if (!value) return 0;
+    return new Blob([value]).size;
+  } catch (error) {
+    console.error(`Error getting usage for key ${key}:`, error);
+    return 0;
+  }
+}
+
+/**
+ * Clear all localStorage data
+ * @returns True if successful
+ */
+export function clearAllStorage(): boolean {
+  try {
+    localStorage.clear();
+    console.log('All localStorage data cleared');
+    return true;
+  } catch (error) {
+    console.error('Error clearing localStorage:', error);
+    return false;
+  }
+}
+
+/**
+ * Get storage health status based on usage percentage
+ * @param percentage - Usage percentage
+ * @returns Health status object
+ */
+export function getStorageHealth(percentage: number): {
+  status: 'healthy' | 'warning' | 'critical';
+  message: string;
+  color: string;
+} {
+  if (percentage >= 95) {
+    return {
+      status: 'critical',
+      message: 'Storage is critically full',
+      color: 'red'
+    };
+  } else if (percentage >= 80) {
+    return {
+      status: 'warning',
+      message: 'Storage is getting full',
+      color: 'orange'
+    };
+  } else {
+    return {
+      status: 'healthy',
+      message: 'Storage is healthy',
+      color: 'green'
+    };
+  }
+}
+
+/**
+ * Estimate available storage space
+ * @returns Estimated available bytes
+ */
+export function getAvailableStorage(): number {
+  const limit = getStorageLimit();
+  const { total } = getLocalStorageUsage();
+  return Math.max(0, limit - total);
+}
+
+/**
+ * Check if a specific amount of data can be stored
+ * @param sizeInBytes - Size to check in bytes
+ * @returns Object with canStore boolean and available space
+ */
+export function canStoreData(sizeInBytes: number): {
+  canStore: boolean;
+  available: number;
+  required: number;
+} {
+  const available = getAvailableStorage();
+  return {
+    canStore: available >= sizeInBytes,
+    available,
+    required: sizeInBytes
+  };
+}

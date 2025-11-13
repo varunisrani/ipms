@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Upload, HardDrive, Users, FileImage, ArrowRight, AlertCircle } from 'lucide-react';
+import { Upload, HardDrive, Users, FileImage, ArrowRight, AlertCircle, Download } from 'lucide-react';
 import { PatientList } from '@/components/patient/patient-list';
 import { useStorageInfo } from '@/lib/hooks/use-storage-info';
 import { initializeStorage } from '@/lib/storage/file-storage';
+import { ExportDataButton } from '@/components/export/export-data-button';
 
 export default function HomePage() {
   const { storageInfo, metadata, isLoading } = useStorageInfo();
@@ -101,7 +102,7 @@ export default function HomePage() {
       )}
 
       {/* Stats Cards */}
-      <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
           <div className="flex items-center justify-between">
             <div>
@@ -162,7 +163,10 @@ export default function HomePage() {
             </div>
           )}
         </div>
+      </div>
 
+      {/* Quick Actions */}
+      <div className="mb-8 grid gap-6 sm:grid-cols-2">
         <Link
           href="/upload"
           className="group rounded-lg border border-zinc-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:from-blue-950/50 dark:to-blue-900/50"
@@ -175,12 +179,37 @@ export default function HomePage() {
               <p className="mt-2 text-xl font-bold text-blue-900 dark:text-blue-50">
                 Upload Files
               </p>
+              <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                Add new patient photos
+              </p>
             </div>
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600 text-white transition-transform group-hover:scale-110">
               <Upload className="h-6 w-6" />
             </div>
           </div>
         </Link>
+
+        <div className="rounded-lg border border-zinc-200 bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-sm dark:border-zinc-800 dark:from-green-950/50 dark:to-green-900/50">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                Data Backup
+              </p>
+              <p className="mt-2 text-xl font-bold text-green-900 dark:text-green-50">
+                Export All Data
+              </p>
+              <p className="mt-1 text-sm text-green-700 dark:text-green-300">
+                Download complete backup as JSON
+              </p>
+              <div className="mt-4">
+                <ExportDataButton variant="outline" className="border-green-200 bg-white text-green-900 hover:bg-green-50 dark:border-green-800 dark:bg-green-950 dark:text-green-50 dark:hover:bg-green-900" />
+              </div>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-600 text-white">
+              <Download className="h-6 w-6" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Patient List Section */}
