@@ -16,11 +16,10 @@ export {
   type UseStorageInfoReturn,
 } from "./use-storage-info";
 
-// File Upload Hook (Phase 2 structure)
+// File Upload Hook
 export {
   useFileUpload,
   type FileUploadProgress,
   type UploadOptions,
-  type UploadedFile,
   type UseFileUploadReturn,
 } from "./use-file-upload";

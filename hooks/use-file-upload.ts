@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { format } from "date-fns";
+import type { FileMetadata } from "@/lib/types";
+import { addFiles, getFiles } from "@/lib/storage/file-storage";
+import { convertToBase64, generateFileName, getFileExtension } from "@/lib/utils/file-utils";
+import { validateFiles } from "@/lib/utils/validation";
 
 /**
  * Upload progress information for a single file
@@ -11,7 +16,7 @@ export interface FileUploadProgress {
   /** Upload progress percentage (0-100) */
   progress: number;
   /** Current status of the upload */
-  status: "pending" | "uploading" | "completed" | "error";
+  status: "pending" | "uploading" | "success" | "error";
   /** Error message if upload failed */
   error?: string;
 }
@@ -20,34 +25,16 @@ export interface FileUploadProgress {
  * Options for file upload
  */
 export interface UploadOptions {
+  /** Patient ID for file association */
+  patientId: string;
   /** Maximum file size in bytes (default: 5MB) */
   maxSize?: number;
-  /** Allowed file types (MIME types or extensions) */
-  allowedTypes?: string[];
   /** Callback function called on upload progress */
   onProgress?: (progress: FileUploadProgress[]) => void;
   /** Callback function called on successful upload */
-  onSuccess?: (files: UploadedFile[]) => void;
+  onSuccess?: (files: FileMetadata[]) => void;
   /** Callback function called on upload error */
   onError?: (error: Error) => void;
-}
-
-/**
- * Uploaded file information
- */
-export interface UploadedFile {
-  /** Unique identifier for the uploaded file */
-  id: string;
-  /** Original file name */
-  name: string;
-  /** File size in bytes */
-  size: number;
-  /** MIME type */
-  type: string;
-  /** Upload timestamp */
-  uploadedAt: Date;
-  /** Storage key or URL */
-  storageKey: string;
 }
 
 /**
@@ -55,7 +42,7 @@ export interface UploadedFile {
  */
 export interface UseFileUploadReturn {
   /** Function to upload files */
-  uploadFiles: (files: File[], options?: UploadOptions) => Promise<UploadedFile[]>;
+  uploadFiles: (files: File[], options: UploadOptions) => Promise<FileMetadata[]>;
   /** Whether files are currently being uploaded */
   isUploading: boolean;
   /** Array of upload progress for each file */
@@ -69,13 +56,10 @@ export interface UseFileUploadReturn {
 }
 
 /**
- * Custom hook for handling file uploads
- *
- * **Note: This is a Phase 1 structure. Full implementation will be completed in Phase 2.**
+ * Custom hook for handling file uploads with localStorage integration
  *
  * This hook provides a clean interface for uploading files with progress tracking,
- * error handling, and validation. In Phase 2, this will be integrated with the
- * storage backend (localStorage/IndexedDB).
+ * error handling, validation, and storage integration.
  *
  * @returns {UseFileUploadReturn} File upload functions and state
  *
@@ -86,8 +70,8 @@ export interface UseFileUploadReturn {
  * const handleUpload = async (files: File[]) => {
  *   try {
  *     const uploaded = await uploadFiles(files, {
+ *       patientId: 'PAT001',
  *       maxSize: 5 * 1024 * 1024, // 5MB
- *       allowedTypes: ['image/jpeg', 'image/png'],
  *       onProgress: (progress) => console.log(progress),
  *     });
  *     console.log('Uploaded files:', uploaded);
@@ -101,61 +85,20 @@ export function useFileUpload(): UseFileUploadReturn {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState<FileUploadProgress[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [shouldCancel, setShouldCancel] = useState(false);
 
   /**
-   * Validate a single file against upload options
-   * @param file - File to validate
-   * @param options - Upload options containing validation rules
-   * @returns Validation error message or null if valid
-   */
-  const validateFile = useCallback(
-    (file: File, options?: UploadOptions): string | null => {
-      // Check file size
-      const maxSize = options?.maxSize || 5 * 1024 * 1024; // Default 5MB
-      if (file.size > maxSize) {
-        return `File "${file.name}" exceeds maximum size of ${Math.round(maxSize / 1024 / 1024)}MB`;
-      }
-
-      // Check file type
-      if (options?.allowedTypes && options.allowedTypes.length > 0) {
-        const isAllowed = options.allowedTypes.some((type) => {
-          if (type.startsWith(".")) {
-            // Extension check
-            return file.name.toLowerCase().endsWith(type.toLowerCase());
-          }
-          // MIME type check
-          return file.type === type || file.type.startsWith(type.split("/")[0]);
-        });
-
-        if (!isAllowed) {
-          return `File "${file.name}" type not allowed. Allowed types: ${options.allowedTypes.join(", ")}`;
-        }
-      }
-
-      return null;
-    },
-    []
-  );
-
-  /**
-   * Upload files with progress tracking
-   *
-   * **Phase 2 Implementation Notes:**
-   * - Integrate with storage backend (localStorage/IndexedDB)
-   * - Implement actual file reading and storage
-   * - Add thumbnail generation for images
-   * - Implement chunked upload for large files
-   * - Add retry logic for failed uploads
-   * - Implement parallel upload with concurrency control
+   * Upload files with progress tracking and storage integration
    *
    * @param files - Array of files to upload
-   * @param options - Upload options
-   * @returns Promise resolving to array of uploaded file information
+   * @param options - Upload options including patient ID
+   * @returns Promise resolving to array of uploaded file metadata
    */
   const uploadFiles = useCallback(
-    async (files: File[], options?: UploadOptions): Promise<UploadedFile[]> => {
+    async (files: File[], options: UploadOptions): Promise<FileMetadata[]> => {
       setIsUploading(true);
       setError(null);
+      setShouldCancel(false);
 
       // Initialize progress tracking
       const initialProgress: FileUploadProgress[] = files.map((file) => ({
@@ -166,66 +109,125 @@ export function useFileUpload(): UseFileUploadReturn {
       setProgress(initialProgress);
 
       try {
+        const { patientId, maxSize = 5 * 1024 * 1024 } = options;
+
         // Validate all files first
-        for (const file of files) {
-          const validationError = validateFile(file, options);
-          if (validationError) {
-            throw new Error(validationError);
-          }
+        const { valid, invalid } = validateFiles(files, maxSize);
+
+        if (invalid.length > 0) {
+          const errorMsg = invalid.map((item) => `${item.file.name}: ${item.error}`).join("; ");
+          throw new Error(errorMsg);
         }
 
-        // TODO Phase 2: Implement actual upload logic
-        // This is a placeholder structure for Phase 2 implementation
-        const uploadedFiles: UploadedFile[] = [];
+        // Get current date for file naming
+        const currentDate = format(new Date(), "yyyy-MM-dd");
 
-        // Simulate upload for structure demonstration
-        // In Phase 2, replace this with actual file storage logic
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
+        // Get existing files for this patient and date to determine sequence numbers
+        const existingFiles = getFiles(patientId, currentDate);
+        let sequence = existingFiles.length + 1;
+
+        const uploadedFiles: FileMetadata[] = [];
+
+        // Process each file
+        for (let i = 0; i < valid.length; i++) {
+          // Check if upload was cancelled
+          if (shouldCancel) {
+            throw new Error("Upload cancelled by user");
+          }
+
+          const file = valid[i];
 
           // Update progress to uploading
           setProgress((prev) =>
             prev.map((p, idx) =>
-              idx === i ? { ...p, status: "uploading" as const, progress: 0 } : p
+              idx === i ? { ...p, status: "uploading" as const, progress: 10 } : p
             )
           );
 
-          // TODO Phase 2: Implement file reading and storage
-          // - Read file using FileReader API
-          // - Convert to appropriate format (base64, ArrayBuffer, etc.)
-          // - Store in localStorage or IndexedDB
-          // - Generate thumbnail if image
-          // - Track progress during processing
+          try {
+            // Convert file to base64 (progress: 10% -> 50%)
+            const base64Data = await convertToBase64(file);
 
-          // Placeholder uploaded file info
-          const uploadedFile: UploadedFile = {
-            id: `file-${Date.now()}-${i}`,
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            uploadedAt: new Date(),
-            storageKey: `photos/${Date.now()}-${file.name}`,
-          };
+            // Update progress
+            setProgress((prev) =>
+              prev.map((p, idx) => (idx === i ? { ...p, progress: 50 } : p))
+            );
 
-          uploadedFiles.push(uploadedFile);
+            // Generate filename
+            const extension = getFileExtension(file.name);
+            const storedName = generateFileName(patientId, currentDate, sequence, extension);
 
-          // Update progress to completed
-          setProgress((prev) =>
-            prev.map((p, idx) =>
-              idx === i ? { ...p, status: "completed" as const, progress: 100 } : p
-            )
-          );
+            // Create file metadata
+            const fileMetadata: FileMetadata = {
+              id: `${patientId}-${currentDate}-${sequence}-${Date.now()}`,
+              patientId,
+              originalName: file.name,
+              storedName,
+              fileType: extension.replace(".", "").toUpperCase(),
+              mimeType: file.type,
+              size: file.size,
+              uploadedAt: new Date().toISOString(),
+              date: currentDate,
+              sequence,
+              base64Data,
+            };
 
-          // Call progress callback if provided
-          if (options?.onProgress) {
-            options.onProgress(
-              initialProgress.map((p, idx) =>
-                idx <= i
-                  ? { ...p, status: "completed" as const, progress: 100 }
+            // Update progress
+            setProgress((prev) =>
+              prev.map((p, idx) => (idx === i ? { ...p, progress: 75 } : p))
+            );
+
+            uploadedFiles.push(fileMetadata);
+            sequence++; // Increment sequence for next file
+
+            // Update progress to success
+            setProgress((prev) =>
+              prev.map((p, idx) =>
+                idx === i ? { ...p, status: "success" as const, progress: 100 } : p
+              )
+            );
+
+            // Call progress callback if provided
+            if (options?.onProgress) {
+              const currentProgress = initialProgress.map((p, idx) =>
+                idx < i
+                  ? { ...p, status: "success" as const, progress: 100 }
+                  : idx === i
+                  ? { ...p, status: "success" as const, progress: 100 }
+                  : p
+              );
+              options.onProgress(currentProgress);
+            }
+          } catch (fileError) {
+            const errorMsg =
+              fileError instanceof Error
+                ? fileError.message
+                : `Failed to upload ${file.name}`;
+
+            // Update progress to error for this file
+            setProgress((prev) =>
+              prev.map((p, idx) =>
+                idx === i
+                  ? { ...p, status: "error" as const, error: errorMsg, progress: 0 }
                   : p
               )
             );
+
+            // Continue with other files instead of stopping
+            console.error(`Error uploading ${file.name}:`, fileError);
           }
+        }
+
+        // If no files were successfully uploaded, throw error
+        if (uploadedFiles.length === 0) {
+          throw new Error("No files were successfully uploaded");
+        }
+
+        // Save all uploaded files to storage
+        const saved = addFiles(patientId, uploadedFiles);
+
+        if (!saved) {
+          throw new Error("Failed to save files to storage");
         }
 
         // Call success callback if provided
@@ -238,7 +240,7 @@ export function useFileUpload(): UseFileUploadReturn {
         const errorMessage = err instanceof Error ? err.message : "Upload failed";
         setError(errorMessage);
 
-        // Update progress to show errors
+        // Update progress to show errors for pending/uploading files
         setProgress((prev) =>
           prev.map((p) =>
             p.status === "uploading" || p.status === "pending"
@@ -255,9 +257,10 @@ export function useFileUpload(): UseFileUploadReturn {
         throw err;
       } finally {
         setIsUploading(false);
+        setShouldCancel(false);
       }
     },
-    [validateFile]
+    [shouldCancel]
   );
 
   /**
@@ -269,16 +272,9 @@ export function useFileUpload(): UseFileUploadReturn {
 
   /**
    * Cancel ongoing upload
-   *
-   * **Phase 2 Implementation:**
-   * - Implement AbortController for cancelling fetch requests
-   * - Clean up partially uploaded files
-   * - Reset progress state
    */
   const cancelUpload = useCallback(() => {
-    // TODO Phase 2: Implement upload cancellation
-    setIsUploading(false);
-    setProgress([]);
+    setShouldCancel(true);
     setError("Upload cancelled");
   }, []);
 
